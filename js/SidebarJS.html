@@ -1,0 +1,137 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+  /**
+   * Run initializations on sidebar load.
+   */
+  $(function() {
+    // Assign handler functions to sidebar elements here, if needed.
+    $('#createGame').click(onCreateGame);
+    $('#resetGame').click(onResetGame);
+    $('#addAnotherPlayer').click(addAnotherPlayer);
+    $('#addAnotherExcludedDate').click(addAnotherExcludedDate);
+
+    // Set start date to today
+    $('#startDate')[0].valueAsDate = new Date();
+    // Set end date to 30 days from now.
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 30);
+    $('#endDate')[0].valueAsDate = endDate;
+
+    // Some default holidays to exclude:
+    addAnotherExcludedDate(null, '2022-02-21');
+    addAnotherExcludedDate(null, '2022-05-30');
+    addAnotherExcludedDate(null, '2022-06-20');
+    addAnotherExcludedDate(null, '2022-07-04');
+    addAnotherExcludedDate(null, '2022-07-05');
+    addAnotherExcludedDate(null, '2022-09-05');
+    addAnotherExcludedDate(null, '2022-11-24');
+    addAnotherExcludedDate(null, '2022-11-25');
+    addAnotherExcludedDate(null, '2022-12-23');
+    addAnotherExcludedDate(null, '2022-12-26');
+    addAnotherExcludedDate(null, '2022-12-30');
+
+    // Add 5 empty player slots to start.
+    // addAnotherPlayer(null, 'Jeff', 'jeff.prouty@gmail.com');
+    // addAnotherPlayer(null, 'Test', 'jeff.prouty.test@gmail.com');
+    addAnotherPlayer();
+    addAnotherPlayer();
+    addAnotherPlayer();
+
+    // Call the server here to retrieve any information needed to build
+    // the dialog, if necessary.
+  });
+
+  function addAnotherExcludedDate(event=null, dateValue='') {
+    const newRow = $(`<tr>
+        <td><input type="date" name="excludedDates" value="${dateValue}" /></td>
+        <td><button>x</button></td>
+      </tr>`);
+    newRow.find("button").click((e) => {
+      newRow.remove();
+    });
+    $('#excludeDatesTable > tbody').append(newRow);
+  }
+
+  function addAnotherPlayer(event=null, name='', email='') {
+    const newRow = $(`<tr>
+        <td><input type="text" name="playerNames" value="${name}" placeholder="Name" /></td>
+        <td><input type="text" name="playerEmails" value="${email}" placeholder="Email" /></td>
+        <td><button>x</button></td>
+      </tr>`);
+    newRow.find("button").click((e) => {
+      newRow.remove();
+    });
+    $('#playerTable > tbody').append(newRow);
+  }
+
+  /**
+   * Calls the server to create the game.
+   */
+  function onCreateGame() {
+    this.disabled = true;
+
+    const form = $('#gameForm').get()[0];
+    // Gather any information that needs to be sent to the server here.
+    // Send the value to the server and handle the response.
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('Game created! Enjoy.');
+            element.display = 'none';
+            $('#resetGame').display = 'block';
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .createGame(form);
+
+    showStatus('Creating game; this can take 1-5 minutes depending on the number of players.');
+  }
+
+  /**
+   * Calls the server to create the game.
+   */
+  function onResetGame() {
+    this.disabled = true;
+
+    // Gather any information that needs to be sent to the server here.
+    // Send the value to the server and handle the response.
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            showStatus('Game reset');
+            element.display = 'none';
+            $('#createGame').display = 'block';
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .resetGame();
+    showStatus('Reseting the game; this will only take a moment.');
+  }
+
+  /**
+   * Displays the given status message in the sidebar.
+   *
+   * @param {String} msg The status message to display.
+   * @param {String} classId The message type (class id) that the message
+   *   should be displayed as.
+   */
+  function showStatus(msg, classId) {
+    $('#status').removeClass().html(msg);
+    if (classId) {
+      $('#status').addClass(classId);
+    }
+  }
+
+</script>

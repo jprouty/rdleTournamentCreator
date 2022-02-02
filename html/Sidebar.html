@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <!-- Use a templated HTML printing scriptlet to import common stylesheet -->
+    <?!= HtmlService.createHtmlOutputFromFile('Stylesheet').getContent(); ?>
+  </head>
+  <body>
+    <!-- Below is the HTML code that defines the sidebar element structure. -->
+    <div class="sidebar branding-below">
+      <p>
+        This sidebar allows you to pull a value from a cell into the sidebar
+        and place a value from the sidebar into a cell.
+      </p>
+      <form id="gameForm">
+        <fieldset id="dateRange">
+          <legend>When would you like to play?</legend>
+          <p>
+            <label for="startDate">
+              <span>Start: </span>
+              <strong><abbr title="required">*</abbr></strong>
+            </label>
+            <input type="date" id="startDate" name="startDate" />
+          </p>
+          <p>
+            <label for="endDate">
+              <span>End: </span>
+              <strong><abbr title="required">*</abbr></strong>
+            </label>
+            <input type="date" id="endDate" name="endDate" />
+          </p>
+        </fieldset>
+        <fieldset id="daysOfWeek">
+          <legend>Which days of the week to play?</legend>
+          <p>
+            <label for="sunday">
+              <span>Sunday: </span>
+            </label>
+            <input type="checkbox" name="daysOfWeek" value="0" id="sunday" />
+          </p>
+          <p>
+            <label for="monday">
+              <span>Monday: </span>
+            </label>
+            <input type="checkbox" name="daysOfWeek" value="1" id="monday" checked />
+          </p>
+          <p>
+            <label for="tuesday">
+              <span>Tuesday: </span>
+            </label>
+            <input type="checkbox" name="daysOfWeek" value="2" id="tuesday" checked />
+          </p>
+          <p>
+            <label for="wednesday">
+              <span>Wednesday: </span>
+            </label>
+            <input type="checkbox" name="daysOfWeek" value="3" id="wednesday" checked />
+          </p>
+          <p>
+            <label for="thursday">
+              <span>Thursday: </span>
+            </label>
+            <input type="checkbox" name="daysOfWeek" value="4" id="thursday" checked />
+          </p>
+          <p>
+            <label for="friday">
+              <span>Friday: </span>
+            </label>
+            <input type="checkbox" name="daysOfWeek" value="5" id="friday" checked />
+          </p>
+          <p>
+            <label for="saturday">
+              <span>Saturday: </span>
+            </label>
+            <input type="checkbox" name="daysOfWeek" value="6" id="saturday" />
+          </p>
+        </fieldset>
+        <fieldset id="excludedDatesSet">
+          <legend>Exclude these days</legend>
+          <table id="excludeDatesTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2"><button id="addAnotherExcludedDate">Add another</button></td>
+              </tr>
+            </tfoot>
+          </table>
+        </fieldset>
+        <fieldset id="options">
+          <legend>Game Options</legend>
+          <p>
+            <label for="scoreForTrying" title="This is the score a player will be
+awarded if they play for a day but do not
+solve the puzzle after 6 guesses. The share
+result indicates this with an 'X/6'.
+
+Note: Players must still insert their
+'share' result from Wordle to get credit
+for playing.">
+              <span>Score for a loss: </span>
+            </label>
+            <input type="input" id="scoreForTrying" name="scoreForTrying" value="7" size="1" />
+          </p>
+          <p>
+            <label for="scoreForSkipping" title="This is the score a player will be
+awarded if they do not play for a given day
+(ie: a blank result box).">
+              <span>Score for unplayed day: </span>
+            </label>
+            <input type="input" id="scoreForSkipping" name="scoreForSkipping" value="8" size="1" />
+          </p>
+          <p>
+            <label for="discardNWorstScores" title="If greater than 0, throw away this
+many of each player's worst scores.
+
+Scores are only thrown out once this many + 1
+days are played, and at which point they are
+phased in one per day until 2x this number of
+days are played.">
+              <span>Throw away X worst scores: </span>
+            </label>
+            <input type="input" id="discardNWorstScores" name="discardNWorstScores" value="0" size="1" />
+          </p>
+          <p>
+            <label for="isProtectedByEmail" title="When checked, only the sheet owner
+(you) or the player (by email) can edit
+their entry rows.
+
+When unchecked, anyone who has edit access
+to the sheet can enter content for all players.">
+              <span>Protect player entry by email: </span>
+            </label>
+            <input type="checkbox" id="isProtectedByEmail" name="isProtectedByEmail" checked />
+          </p>
+          <p>
+            <label for="isNameProtected" title="When this is checked AND protect
+player by email is checked, this allows the
+player to edit their name in the Full Results
+sheet (Leaderboard will auto-update based on
+the Full Results value).
+
+When this is unchecked AND protect player by
+email is checked, only the sheet owner can
+change the display name.">
+              <span>Allow player to change name: </span>
+            </label>
+            <input type="checkbox" id="isNameProtected" name="isNameProtected" checked />
+          </p>
+          <p>
+            <label for="isAwayEnabled" title="When checked, adds an 'Away' column.
+This allows for a player to be excused
+from playing the game for one or more
+days without a negative effect on their
+score. Scoring wise, each day away is
+removed when computing the per-day average
+(per-day score and count of days are
+removed and reduced respectively).
+
+When unchecked, the away feature is
+not present.">
+              <span>Add 'Away' feature: </span>
+            </label>
+            <input type="checkbox" id="isAwayEnabled" name="isAwayEnabled" checked />
+          </p>
+          <p>
+            <label for="isAwayProtected" title="Requires the 'Away' feature to be enabled.
+
+When unchecked, only the sheet owner can
+update the 'Away' column. This can be
+helpful to prevent players from randomly
+taking days off.
+
+When this is checked AND the protect player
+entry by email option is checked, only the
+sheet owner or the player may update the
+away check box.
+
+When this is checked AND the protect player
+entry by email option is NOT checked, all
+editors of the sheet may update all 'Away'
+fields.
+">
+              <span>Allow players to toggle 'Away': </span>
+            </label>
+            <input type="checkbox" id="isAwayProtected" name="isAwayProtected" checked />
+          </p>
+        </fieldset>
+        <fieldset id="players">
+          <legend>Player List</legend>
+          <table id="playerTable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Remove</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3"><button id="addAnotherPlayer">Add another player</button></td>
+              </tr>
+            </tfoot>
+          </table>
+        </fieldset>
+      </form>
+      <div class="block" id="sidebar-button-bar">
+        <button id="createGame">Create Game</button>
+      </div>
+      <div id="status"></div>
+    </div>
+
+    <div class="sidebar bottom">
+      <span class="gray branding-text">Copyright Jeff Prouty 2022</span>
+    </div>
+
+    <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
+    <?!= HtmlService.createHtmlOutputFromFile('SidebarJavaScript').getContent(); ?>
+  </body>
+</html>
